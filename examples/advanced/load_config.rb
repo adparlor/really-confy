@@ -4,6 +4,7 @@ $: << File.absolute_path('../../lib')
 require 'confy'
 
 options = {
+  env_var_name: 'FOOBAR_ENV',
   config_path: './foobar',
   config_files: ['config.yml', 'local.yml'],
   local_config_files: ['local.yml'],
