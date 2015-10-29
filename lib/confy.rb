@@ -59,10 +59,12 @@ class Confy
     unless multi_env_configs.any?{|config| config.is_a?(Hash) && config.has_key?(env) }
       fail ConfigError, "#{env.inspect} is not a valid environment! None of the loaded configs"+
         " had a top-level #{env.inspect} key. All configurations should be nested under top"+
-        " level keys corresponding to environment names (e.g. test:, development:, etc.)"
+        " level keys corresponding to environment names (e.g. 'test', 'development', ...)"
     end
 
-    env_configs = multi_env_configs.map{|multi_env_config| multi_env_config.fetch(env, {}) }
+    env_configs = multi_env_configs.map{|multi_env_config|
+        multi_env_config.fetch('DEFAULTS', {}).deep_merge multi_env_config.fetch(env, {})
+      }
     merged_config = env_configs.reduce{|merged_config, config| merged_config.deep_merge(config) }
 
     merged_config['env'] ||= env
@@ -76,6 +78,14 @@ class Confy
   def load_config_file(file)
     full_path = full_path_to_config_file(file)
     multi_env_config = (YAML.load_file full_path)
+
+    # YAML.load_file will return false if given an empty file to load
+    return {} if multi_env_config == false
+
+    unless multi_env_config.is_a? Hash
+      fail ConfigError, "Config file #{file.inspect} must contain a YAML-encoded Hash, but"+
+        " it seems to contain a #{multi_env_config.class}"
+    end
 
     multi_env_config
   end
@@ -106,7 +116,7 @@ class Confy
 
     local_config_files.each do |file|
       relative_path = relative_path_to_config_file(file)
-      if file_is_in_git?
+      if file_is_in_git? relative_path
         fail ConfigError, "Local config file #{relative_path.inspect} exists in the git repo!"
           " Remove this file from your git repo and add it to your .gitignore"
       end
@@ -127,7 +137,7 @@ class Confy
   end
 
   def file_is_in_git?(file)
-    git_cmd = "gith ls-tree HEAD #{relative_path}"
+    git_cmd = "git ls-tree HEAD #{file}"
     git_output = `#{git_cmd}`.strip
 
     not git_output.empty?
