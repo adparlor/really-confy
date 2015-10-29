@@ -1,4 +1,4 @@
-# Comfy
+# Confy
 ##### A simple YAML configuration loader.
 
 We use Confy to configure [Grape](https://github.com/ruby-grape/grape)
