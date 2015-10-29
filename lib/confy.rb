@@ -18,6 +18,10 @@ class Confy
       'config.yml',
       'config.secret.yml'
     ],
+    # load will print a warning if these files are missing
+    suggested_config_files: [
+    ],
+    # the environment key will be selected based on this ENV variable
     env_var_name: 'CONFY_ENV',
     symbol_keys: false,
     indifferent_keys: false
@@ -27,6 +31,7 @@ class Confy
   attr_accessor :config_path
   attr_accessor :local_config_files
   attr_accessor :required_config_files
+  attr_accessor :suggested_config_files
   attr_accessor :env_var_name
   attr_accessor :env
 
@@ -40,6 +45,7 @@ class Confy
     @env = opts[:env] if opts.has_key? :env
 
     ensure_required_config_files_exist
+    check_suggested_config_files_exist
     ensure_local_config_files_are_not_in_git
 
     if @symbol_keys && @indifferent_keys
@@ -106,6 +112,15 @@ class Confy
       unless File.exists? full_path
         fail ConfigError, "Required config file #{file.inspect} does not exist under"+
           " #{full_path.inspect}!"
+      end
+    end
+  end
+
+  def check_suggested_config_files_exist
+    (suggested_config_files - required_config_files).each do |file|
+      full_path = full_path_to_config_file(file)
+      unless File.exists? full_path
+        print_warning "WARNING: Config file #{file.inspect} does not exist!"
       end
     end
   end
