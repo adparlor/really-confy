@@ -38,7 +38,10 @@ class Confy
     quiet: false,
     # enable colorized output; nil means 'auto', which enables color by default unless the
     # terminal doesn't support it
-    color: nil
+    color: nil,
+    # force the ruby interpreter to exit if Confy encounters an error during load
+    # ... not a good idea to use this with quiet:true unless you know exactly what you're doing
+    exit_on_error: false
   }
 
   attr_accessor :config_files
@@ -112,6 +115,10 @@ class Confy
     print_error ""
     print_error "!"*header.length
     print_error ""
+    if @exit_on_error
+      print_error "Aborting because the :exit_on_error option is true!"
+      exit 666
+    end
     raise e
   end
 
