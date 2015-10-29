@@ -26,6 +26,7 @@ class Confy
     ],
     # load will print a warning if these files are missing
     suggested_config_files: [
+      'config.secret.yml'
     ],
     # the environment key will be selected based on this ENV variable
     env_var_name: 'CONFY_ENV',
