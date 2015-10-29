@@ -1,11 +1,17 @@
-development:
-  db: &default_db
+DEFAULTS:
+  db:
     adapter: mysql2
     hostname: localhost
     username: root
 
+development:
+  db:
+    database: foo_development
+
 test:
-  db: *default_db
+  db:
+    database: foo_test
 
 production:
-  db: *default_db
+  db:
+    database: foo_production

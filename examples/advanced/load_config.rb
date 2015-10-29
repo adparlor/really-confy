@@ -22,12 +22,13 @@ $CONFIG = Confy.new(options).load
 #
 #  {
 #    "db" => {
-#      "adapater => "mysql2",
-#      :hostname => "localhost",
-#      :username => "tester",
-#      :password => "foobar"
+#      "adapater" => "mysql2",
+#      "hostname" => "localhost",
+#      "username" => "tester",
+#      "password" => "foobar"
+#      "database" => "foo_test"
 #    },
-#    :env => "test"
+#    "env" => "test"
 #  }
 #
 
