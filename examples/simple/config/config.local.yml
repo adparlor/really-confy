@@ -1,0 +1,8 @@
+# NOTE: Confy will refuse to load this file if it were added to your project's git repo!
+test:
+  db:
+    username: tester
+
+production:
+  db:
+    hostname: mysql1.example.com

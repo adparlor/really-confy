@@ -1,0 +1,11 @@
+development:
+  db: &default_db
+    adapter: mysql2
+    hostname: localhost
+    username: root
+
+test:
+  db: *default_db
+
+production:
+  db: *default_db

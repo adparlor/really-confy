@@ -1,0 +1,8 @@
+test:
+  db:
+    username: tester
+    password: foobar
+
+production:
+  db:
+    hostname: some.other.server

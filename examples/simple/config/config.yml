@@ -1,0 +1,17 @@
+development:
+  db:
+    adapter: mysql2
+    hostname: localhost
+    username: root
+
+test:
+  db:
+    adapter: mysql2
+    hostname: localhost
+    username: root
+
+production:
+  db:
+    adapter: mysql2
+    hostname: localhost
+    username: root
