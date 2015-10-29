@@ -1,19 +1,25 @@
 require 'yaml'
+require 'rainbow'
 require 'active_support/core_ext/hash/deep_merge'
 
 class Confy
 
   DEFAULT_OPTIONS = {
+    # look for config files under this directory
     config_path: './config',
+    # load and reucrisvely merge the config from these files, in the given order (duplicate keys
+    # in later files will override those in earlier files)
     config_files: [
       'config.yml',
       'config.secret.yml',
       'config.local.yml'
     ],
+    # load will raise a ConfigError if these files are in the git repo
     local_config_files: [
       'config.secret.yml',
       'config.local.yml'
     ],
+    # load will raise a ConfigError if these files are missing
     required_config_files: [
       'config.yml',
       'config.secret.yml'
@@ -23,8 +29,15 @@ class Confy
     ],
     # the environment key will be selected based on this ENV variable
     env_var_name: 'CONFY_ENV',
+    # use Symbols instead of Strings for all keys in the config Hash
     symbol_keys: false,
-    indifferent_keys: false
+    # load will return an ActiveSupport::HashWithIndifferentAccess instead of a Hash
+    indifferent_keys: false,
+    # suppress output to stdout/stderr
+    quiet: false,
+    # enable colorized output; nil means 'auto', which enables color by default unless the
+    # terminal doesn't support it
+    color: nil
   }
 
   attr_accessor :config_files
@@ -44,6 +57,9 @@ class Confy
     @env_var_name = @env_var_name.to_s if @env_var_name # ENV keys are always strings
     @env = opts[:env] if opts.has_key? :env
 
+    @rainbow = Rainbow.new
+    @rainbow.enabled = @color unless @color.nil?
+
     ensure_required_config_files_exist
     check_suggested_config_files_exist
     ensure_local_config_files_are_not_in_git
@@ -58,9 +74,14 @@ class Confy
   end
 
   def load
-    multi_env_configs = config_files
-      .select{|file| File.exists? full_path_to_config_file(file) }
-      .map{|file| load_config_file(file) }
+    existing_config_files =
+      config_files.select{|file| File.exists? full_path_to_config_file(file) }
+
+    print_info "Loading config from #{existing_config_files.inspect} for #{env.inspect}"+
+      " environment..."
+
+    multi_env_configs =
+      existing_config_files.map{|file| load_config_file(file) }
 
     unless multi_env_configs.any?{|config| config.is_a?(Hash) && config.has_key?(env) }
       fail ConfigError, "#{env.inspect} is not a valid environment! None of the loaded configs"+
@@ -79,6 +100,18 @@ class Confy
     merged_config = merged_config.with_indifferent_access if @indifferent_keys
 
     merged_config
+  rescue => e
+    header = "!!! Couldn't load config for #{env.inspect} environment! !!!"
+    print_error ""
+    print_error "!"*header.length
+    print_error "#{header}"
+    print_error "!"*header.length
+    print_error ""
+    print_error "#{e}"
+    print_error ""
+    print_error "!"*header.length
+    print_error ""
+    raise e
   end
 
   def load_config_file(file)
@@ -156,6 +189,18 @@ class Confy
     git_output = `#{git_cmd}`.strip
 
     not git_output.empty?
+  end
+
+  def print_error(err)
+    $stderr.puts @rainbow.wrap(err).red.bright
+  end
+
+  def print_warning(warning)
+    $stderr.puts @rainbow.wrap(warning).yellow.bright
+  end
+
+  def print_info(info)
+    $stdout.puts @rainbow.wrap(info).cyan
   end
 
   def env
