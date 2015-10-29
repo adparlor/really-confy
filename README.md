@@ -1,6 +1,5 @@
 # Comfy
-
-** Simple YAML configuration loader. **
+##### A simple YAML configuration loader.
 
 We use Confy to configure [Grape](https://github.com/ruby-grape/grape)
 applications, but it's flexible enough for just about anything.
@@ -23,6 +22,7 @@ The configuration from each of these files will be loaded and merged. See
 below for a description of each file's intended role.
 
 ```ruby
+require 'confy'
 confy = Confy.new(env_var_name: 'MY_APP_ENV')
 $CONFIG = confy.load
 ```
@@ -126,29 +126,44 @@ confy = Confy.new(
 See `DEFAULT_OPTIONS` in `confy.rb` for a list of all available options. Options include:
 
 - `:config_files` (default: `["config.yml", "config.secret.yml", "config.local.yml"]`)
+
   The list of all config files that will be loaded. Files are loaded in
   order, with each subsequent file's key values recursively merged in.
+
 - `:config_path` (default: `./config`)
+
   Config files should be placed in this directory.
+
 - `:required_config_files`  (default: `["config.yml"]`)
+
   If any one of these files doesn't exist, `Confy#load` will print an
   error message to stderr and fail with a `Confy::ConfigError`.
+
 - `:local_config_files`  (default: `["config.secret.yml", "config.local.yml"]`)
+
   These files are meant to exist locally only. If any of these files are found
   in the git repo, `Confy#load` will print an error message to stderr and fail
   with a `Confy::ConfigError`.
+
 - `:suggested_config_files`  (default: `[config.secret.yml"]`)
+
   If any of these files are missing, `Confy#load` will print a warning to
   stderr but will allow you to proceed.
+
 - `:symbol_keys` (default: `false`)
+
   By default `Confy#load` return a Hash with Strings for keys. If
   `:symbol_keys` is true, a Hash with Symbols for keys will be returned
   instead.
+
 - `:indifferent_keys` (default: `false`)
+
   `Confy#load` will return an ActiveSupport::HashWithIndifferentAccess instead
   of a regular Hash. This makes it possible to access config files usinb both
   Strings and Symbols (e.g. `config[:foo] == config['foo']`).
+
 - `:quiet` (default: `false`)
+
   Suppresses output to stdout/stderr. Confy will still raise `ConfigErrors`,
   but will not print anything on its ow.
 
