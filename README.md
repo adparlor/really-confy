@@ -168,7 +168,7 @@ See `DEFAULT_OPTIONS` in `confy.rb` for a list of all available options. Options
   but will not print anything on its ow.
 
 
-### `DEFAULTS` environment
+### config `DEFAULTS`
 
 In addition to environment keys (`production`, `test`, etc.), every config
 file can also contain a special `DEFAULTS` key. The configuration
@@ -201,7 +201,7 @@ When loaded under the `'test'` env, the above config would contain:
 }
 ```
 
-... and under the `'production'` env, ti would contain:
+... and under the `'production'` env, it would contain:
 
 ```ruby
 {
