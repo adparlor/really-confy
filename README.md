@@ -88,9 +88,8 @@ for a specific installation by setting a different value for this key in the
 `config.local.yml` file.
 
 This file is entirely optional. Since this file is intended as a way of
-specifying local overrides for the main `config.yml` distributed with your
-code, Confy will not allow you to check the `config.loca.yml` file into your
-git repo.
+specifying local overrides, it should not be added into your git repo.
+Confy will raise an error if it detects this file in git.
 
 Example:
 
@@ -127,7 +126,7 @@ See `DEFAULT_OPTIONS` in `confy.rb` for a list of all available options. Options
 
 - `:config_files` (default: `["config.yml", "config.secret.yml", "config.local.yml"]`)
 
-  The list of all config files that will be loaded. Files are loaded in
+  The list of all config files that will be loaded. Files are loaded inopt
   order, with each subsequent file's key values recursively merged in.
 
 - `:config_path` (default: `./config`)
