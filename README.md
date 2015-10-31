@@ -49,7 +49,23 @@ appropriate set of options from the config files (e.g. `test`, `development`,
 `production`). For example, to use a `test` configuration, you would start
 your app on the command line with `MY_APP_ENV=test ruby my_app.rb`.
 
-That's it. `$CONFIG` now holds a Hash with your app's full configuration.
+That's it. `$CONFIG` now holds a `ReallyConfy::Config` instance with your app's
+full configuration.
+
+A `ReallyConfy::Config` is a kind of `[Hashie::Mash](https://github.com/intridea/hashie#mash),`
+which behaves a lot like a regular `Hash`, but has some extra functionality.
+
+For example:
+
+```ruby
+$CONFIG.db.url == $CONFIG[:db][:url]
+```
+
+You can check whether a config key is set using `?`:
+
+```ruby
+$CONFIG.db.url? # => true/false
+```
 
 
 The default config file layout is as follows:
@@ -123,8 +139,8 @@ production:
 
 ## Options
 
-ReallyConfy itself is configured through an options Hash given as the first argment
-to `ReallyConfy.new`. For example:
+ReallyConfy itself is configured through an options Hash given as the first
+argment to `ReallyConfy.new`. For example:
 
 ```ruby
 confy = ReallyConfy.new(
@@ -133,8 +149,7 @@ confy = ReallyConfy.new(
     config_files: ['app.yml', 'local.yml'],
     required_config_files: ['app.yml'],
     local_config_files: ['local.yml'],
-    suggested_config_files: ['local.yml'],
-    symbol_keys: true
+    suggested_config_files: ['local.yml']
   )
 
 ```
@@ -167,22 +182,16 @@ Options include:
   If any of these files are missing, `ReallyConfy#load` will print a warning to
   stderr but will allow you to proceed.
 
-- `:symbol_keys` (default: `false`)
+- `:read_only` (default `false`)
 
-  By default `ReallyConfy#load` return a Hash with Strings for keys. If
-  `:symbol_keys` is true, a Hash with Symbols for keys will be returned
-  instead.
-
-- `:indifferent_keys` (default: `false`)
-
-  `ReallyConfy#load` will return an ActiveSupport::HashWithIndifferentAccess instead
-  of a regular Hash. This makes it possible to access config files usinb both
-  Strings and Symbols (e.g. `config[:foo] == config['foo']`).
+  If true, the configuration cannot be modified once loaded. A RuntimError
+  will be raised if you try to change a config values. This is useful in
+  preventing accidental configuration changes at runtime.
 
 - `:quiet` (default: `false`)
 
-  Suppresses output to stdout/stderr. ReallyConfy will still raise `ConfigErrors`,
-  but will not print anything on its ow.
+  Suppresses output to stdout/stderr. ReallyConfy will still raise
+  `ConfigErrors`, but will not try to render those exceptions to .
 
 
 ### config `DEFAULTS`

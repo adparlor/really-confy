@@ -1,6 +1,8 @@
 require 'yaml'
+require 'hashie/mash'
+require 'hashie/extensions/parsers/yaml_erb_parser'
+require 'hashie/extensions/deep_fetch'
 require 'rainbow'
-require 'active_support/core_ext/hash/deep_merge'
 
 class ReallyConfy
 
@@ -30,10 +32,6 @@ class ReallyConfy
     ],
     # the environment key will be selected based on this ENV variable
     env_var_name: 'CONFY_ENV',
-    # use Symbols instead of Strings for all keys in the config Hash
-    symbol_keys: false,
-    # load will return an ActiveSupport::HashWithIndifferentAccess instead of a Hash
-    indifferent_keys: false,
     # suppress output to stdout/stderr
     quiet: false,
     # enable colorized output; nil means 'auto', which enables color by default unless the
@@ -41,7 +39,9 @@ class ReallyConfy
     color: nil,
     # force the ruby interpreter to exit if ReallyConfy encounters an error during load
     # ... not a good idea to use this with quiet:true unless you know exactly what you're doing
-    exit_on_error: false
+    exit_on_error: false,
+    # Don't allow (inadvertent) modification of the config once it's been loaded
+    read_only: false
   }
 
   attr_accessor :config_files
@@ -67,14 +67,6 @@ class ReallyConfy
     ensure_required_config_files_exist
     check_suggested_config_files_exist
     ensure_local_config_files_are_not_in_git
-
-    if @symbol_keys && @indifferent_keys
-      fail ArgumentError,
-        ":symbol_keys and :indifferent_keys options cannot be used together!"
-    end
-
-    require 'active_support/core_ext/hash/keys' if @symbol_keys
-    require 'active_support/core_ext/hash/indifferent_access' if @indifferent_keys
   end
 
   def load
@@ -87,7 +79,7 @@ class ReallyConfy
     multi_env_configs =
       existing_config_files.map{|file| load_config_file(file) }
 
-    unless multi_env_configs.any?{|config| config.is_a?(Hash) && config.has_key?(env) }
+    unless multi_env_configs.any?{|config| config.has_key?(env) }
       fail ConfigError, "#{env.inspect} is not a valid environment! None of the loaded configs"+
         " had a top-level #{env.inspect} key. All configurations should be nested under top"+
         " level keys corresponding to environment names (e.g. 'test', 'development', ...)"
@@ -100,8 +92,9 @@ class ReallyConfy
 
     merged_config['env'] ||= env
 
-    merged_config.deep_symbolize_keys! if @symbol_keys
-    merged_config = merged_config.with_indifferent_access if @indifferent_keys
+    if @read_only
+      merged_config.freeze
+    end
 
     merged_config
   rescue => e
@@ -112,6 +105,9 @@ class ReallyConfy
     print_error "!"*header.length
     print_error ""
     print_error "#{e}"
+    print_error ""
+    print_error "BACKTRACE:"
+    print_error "  #{e.backtrace.join("\n  ")}"
     print_error ""
     print_error "!"*header.length
     print_error ""
@@ -124,14 +120,11 @@ class ReallyConfy
 
   def load_config_file(file)
     full_path = full_path_to_config_file(file)
-    multi_env_config = (YAML.load_file full_path)
 
-    # YAML.load_file will return false if given an empty file to load
-    return {} if multi_env_config == false
-
-    unless multi_env_config.is_a? Hash
-      fail ConfigError, "Config file #{file.inspect} must contain a YAML-encoded Hash, but"+
-        " it seems to contain a #{multi_env_config.class}"
+    if File.exists? full_path
+      multi_env_config = (ReallyConfy::Config.load full_path)
+    else
+      multi_env_config = ReallyConfy::Config.new {}
     end
 
     multi_env_config
@@ -226,6 +219,18 @@ class ReallyConfy
   def read_opts_into_instance_vars(opts, instance_var_keys)
     instance_var_keys.each do |key|
       instance_variable_set(:"@#{key}", opts.fetch(key, ReallyConfy::DEFAULT_OPTIONS.fetch(key)))
+    end
+  end
+
+  class Config < Hashie::Mash
+    include Hashie::Extensions::DeepFetch
+
+    def freeze
+      super
+      self.values.each do |v|
+        v.freeze
+      end
+      self
     end
   end
 

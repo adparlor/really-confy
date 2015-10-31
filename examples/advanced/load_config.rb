@@ -1,19 +1,17 @@
 # run with `FOOBAR_ENV=test load_config.rb
 
 $: << File.absolute_path('../../lib')
-require 'confy'
+require 'really_confy'
 
 options = {
   env_var_name: 'FOOBAR_ENV',
   config_path: './foobar',
   config_files: ['config.yml', 'local.yml'],
   local_config_files: ['local.yml'],
-  required_config_files: ['config.yml'],
-  symbol_keys: false, # cannot be used together with :indifferent_keys
-  indifferent_keys: true
+  required_config_files: ['config.yml']
 }
 
-$CONFIG = Confy.new(options).load
+$CONFIG = ReallyConfy.new(options).load
 
 # $CONFIG should now contain the merged Hash for FOOBAR_ENV environment from config.yml,
 # and local.yml.
@@ -34,7 +32,8 @@ $CONFIG = Confy.new(options).load
 
 puts $CONFIG.inspect
 
-# Also, because the :indifferent_keys option is true, the following would both print "localhost":
+puts $CONFIG.db.adapater    # => "mysql2"
+puts $CONFIG[:db][:adapter] # => "myslq2"
+puts $CONFIG.db.adapter?    # true
+puts $CONFIG.db.foo?        # false
 
-puts $CONFIG['db']['adapter'] # => "localhost"
-puts $CONFIG[:db][:adapter]   # => "localhost"
