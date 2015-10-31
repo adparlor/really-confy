@@ -9,5 +9,5 @@ Gem::Specification.new do |s|
   s.license = "MIT"
 
   s.add_runtime_dependency 'rainbow', '~> 2.0'
-  s.add_runtime_dependency 'hashie', '~> 3.4.3'
+  s.add_runtime_dependency 'hashie', '~> 3.4'
 end
