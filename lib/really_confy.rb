@@ -2,7 +2,7 @@ require 'yaml'
 require 'rainbow'
 require 'active_support/core_ext/hash/deep_merge'
 
-class Confy
+class ReallyConfy
 
   DEFAULT_OPTIONS = {
     # look for config files under this directory
@@ -39,7 +39,7 @@ class Confy
     # enable colorized output; nil means 'auto', which enables color by default unless the
     # terminal doesn't support it
     color: nil,
-    # force the ruby interpreter to exit if Confy encounters an error during load
+    # force the ruby interpreter to exit if ReallyConfy encounters an error during load
     # ... not a good idea to use this with quiet:true unless you know exactly what you're doing
     exit_on_error: false
   }
@@ -225,7 +225,7 @@ class Confy
 
   def read_opts_into_instance_vars(opts, instance_var_keys)
     instance_var_keys.each do |key|
-      instance_variable_set(:"@#{key}", opts.fetch(key, Confy::DEFAULT_OPTIONS.fetch(key)))
+      instance_variable_set(:"@#{key}", opts.fetch(key, ReallyConfy::DEFAULT_OPTIONS.fetch(key)))
     end
   end
 

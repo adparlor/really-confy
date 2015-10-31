@@ -5,7 +5,7 @@ Gem::Specification.new do |s|
   s.summary = "Simple YAML configuration loader"
   s.authors = ["Matt Zukowski"]
   s.email   = "mzukowski@adknowledge.com"
-  s.files   = ["lib/confy.rb", ]
+  s.files   = ["lib/really_confy.rb", ]
   s.license = "MIT"
 
   s.add_runtime_dependency 'activesupport', '>= 3.0'

@@ -1,7 +1,7 @@
-# Confy
+# ReallyConfy
 ##### A simple YAML configuration loader.
 
-We use Confy to configure [Grape](https://github.com/ruby-grape/grape)
+We use ReallyConfy to configure [Grape](https://github.com/ruby-grape/grape)
 applications, but it's flexible enough for just about anything.
 
 Features:
@@ -9,6 +9,23 @@ Features:
 - Loads your app's configuration from multiple, merged config files
 - Prevents you from putting sensitive config values into your git repo
 - Warns you if suggested config files are missing
+
+## Usage
+
+`gem install really-confy`
+
+Or add it to your `Gemfile`:
+
+`gem 'really-confy'`
+
+Then, in your code:
+
+```ruby
+require 'really_confy'
+$CONFIG = ReallyConfy.new.load
+```
+
+---
 
 The default setup assumes that you have three different config files:
 
@@ -22,12 +39,12 @@ The configuration from each of these files will be loaded and merged. See
 below for a description of each file's intended role.
 
 ```ruby
-require 'confy'
-confy = Confy.new(env_var_name: 'MY_APP_ENV')
+require 'really_confy'
+confy = ReallyConfy.new(env_var_name: 'MY_APP_ENV')
 $CONFIG = confy.load
 ```
 
-`env_var_name` tells Confy to look for ENV['MY_APP_ENV'] to choose the
+`env_var_name` tells ReallyConfy to look for ENV['MY_APP_ENV'] to choose the
 appropriate set of options from the config files (e.g. `test`, `development`,
 `production`). For example, to use a `test` configuration, you would start
 your app on the command line with `MY_APP_ENV=test ruby my_app.rb`.
@@ -64,7 +81,7 @@ production:
 
 ### config/config.secret.yml
 
-Sensitive information -- passwords, API keys, etc. -- should go here. Confy
+Sensitive information -- passwords, API keys, etc. -- should go here. ReallyConfy
 will not allow you to check this file into your git repo, and will warn you if
 this file is missing.
 
@@ -89,7 +106,7 @@ for a specific installation by setting a different value for this key in the
 
 This file is entirely optional. Since this file is intended as a way of
 specifying local overrides, it should not be added into your git repo.
-Confy will raise an error if it detects this file in git.
+ReallyConfy will raise an error if it detects this file in git.
 
 Example:
 
@@ -106,11 +123,11 @@ production:
 
 ## Options
 
-Confy itself is configured through an options Hash given as the first argment
-to `Confy.new`. For example:
+ReallyConfy itself is configured through an options Hash given as the first argment
+to `ReallyConfy.new`. For example:
 
 ```ruby
-confy = Confy.new(
+confy = ReallyConfy.new(
     env_var_name: 'GRAPE_ENV',
     config_path: File.absolute_path(__FILE__)+'/../../conf'
     config_files: ['app.yml', 'local.yml'],
@@ -122,7 +139,8 @@ confy = Confy.new(
 
 ```
 
-See `DEFAULT_OPTIONS` in `confy.rb` for a list of all available options. Options include:
+See `DEFAULT_OPTIONS` in `really_confy.rb` for a list of all available options
+Options include:
 
 - `:config_files` (default: `["config.yml", "config.secret.yml", "config.local.yml"]`)
 
@@ -135,35 +153,35 @@ See `DEFAULT_OPTIONS` in `confy.rb` for a list of all available options. Options
 
 - `:required_config_files`  (default: `["config.yml"]`)
 
-  If any one of these files doesn't exist, `Confy#load` will print an
-  error message to stderr and fail with a `Confy::ConfigError`.
+  If any one of these files doesn't exist, `ReallyConfy#load` will print an
+  error message to stderr and fail with a `ReallyConfy::ConfigError`.
 
 - `:local_config_files`  (default: `["config.secret.yml", "config.local.yml"]`)
 
   These files are meant to exist locally only. If any of these files are found
-  in the git repo, `Confy#load` will print an error message to stderr and fail
-  with a `Confy::ConfigError`.
+  in the git repo, `ReallyConfy#load` will print an error message to stderr and fail
+  with a `ReallyConfy::ConfigError`.
 
 - `:suggested_config_files`  (default: `[config.secret.yml"]`)
 
-  If any of these files are missing, `Confy#load` will print a warning to
+  If any of these files are missing, `ReallyConfy#load` will print a warning to
   stderr but will allow you to proceed.
 
 - `:symbol_keys` (default: `false`)
 
-  By default `Confy#load` return a Hash with Strings for keys. If
+  By default `ReallyConfy#load` return a Hash with Strings for keys. If
   `:symbol_keys` is true, a Hash with Symbols for keys will be returned
   instead.
 
 - `:indifferent_keys` (default: `false`)
 
-  `Confy#load` will return an ActiveSupport::HashWithIndifferentAccess instead
+  `ReallyConfy#load` will return an ActiveSupport::HashWithIndifferentAccess instead
   of a regular Hash. This makes it possible to access config files usinb both
   Strings and Symbols (e.g. `config[:foo] == config['foo']`).
 
 - `:quiet` (default: `false`)
 
-  Suppresses output to stdout/stderr. Confy will still raise `ConfigErrors`,
+  Suppresses output to stdout/stderr. ReallyConfy will still raise `ConfigErrors`,
   but will not print anything on its ow.
 
 
