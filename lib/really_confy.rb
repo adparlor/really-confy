@@ -226,11 +226,18 @@ class ReallyConfy
     include Hashie::Extensions::DeepFetch
 
     def freeze
+      return self if frozen? || singleton?
       super
       self.values.each do |v|
-        v.freeze
+        v.freeze unless frozen? || singleton?
       end
       self
+    end
+
+  private
+
+    def singleton?
+      self.nil? || self == true || self == false
     end
   end
 
