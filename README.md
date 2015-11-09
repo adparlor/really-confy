@@ -18,7 +18,7 @@ Or add it to your `Gemfile`:
 
 `gem 'really-confy'`
 
-Add a `config/config.yml` to your app, with keys for each of your code's config environments:
+Create a `config/config.yml`, with keys for each of your code's config environments:
 
 ```yaml
 development:
@@ -35,6 +35,8 @@ production:
     hostname: mydb.example.com
     database: example_prod
 ```
+
+Note that unlike with other configuration systems (e.g. Rails), the `config.yml` file **should** be checked in to your git repo. Local overrides and sensitive config values are added to other files (`config.local.yml`, `config.secret.yml` — see below for info).
 
 Then, in your code:
 
