@@ -43,6 +43,8 @@ Then, in your code:
 ```ruby
 require 'really_confy'
 $CONFIG = ReallyConfy.new.load
+
+puts $CONFIG.port # ==> 9090 or 8080, depending on the environment selected using `CONFY_ENV=development` or `CONFY_ENV=production`
 ```
 
 ---
