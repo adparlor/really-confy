@@ -1,9 +1,9 @@
 Gem::Specification.new do |s|
   s.name    = "really-confy"
-  s.version = "0.2.0"
+  s.version = "0.2.1"
   s.date    = "2015-10-31"
   s.summary = "Simple YAML configuration loader"
-  s.authors = ["Matt Zukowski"]
+  s.authors = ["Matt Zukowski", "Edward Tam"]
   s.email   = "mzukowski@adknowledge.com"
   s.files   = ["lib/really_confy.rb", ]
   s.license = "MIT"
