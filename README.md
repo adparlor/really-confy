@@ -18,6 +18,24 @@ Or add it to your `Gemfile`:
 
 `gem 'really-confy'`
 
+Add a `config/config.yml` to your app, with keys for each of your code's config environments:
+
+```yaml
+development:
+  port: 9090
+  foo: bar
+  db:
+    hostname: localhost
+    database: example_dev
+
+production:
+  port: 8080
+  foo: barbar
+  db:
+    hostname: mydb.example.com
+    database: example_prod
+```
+
 Then, in your code:
 
 ```ruby
