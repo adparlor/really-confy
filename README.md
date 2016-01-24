@@ -74,7 +74,7 @@ your app on the command line with `MY_APP_ENV=test ruby my_app.rb`.
 That's it. `$CONFIG` now holds a `ReallyConfy::Config` instance with your app's
 full configuration.
 
-A `ReallyConfy::Config` is a kind of `[Hashie::Mash](https://github.com/intridea/hashie#mash),`
+A `ReallyConfy::Config` is a kind of [Hashie::Mash](https://github.com/intridea/hashie#mash),
 which behaves a lot like a regular `Hash`, but has some extra functionality.
 
 For example:
