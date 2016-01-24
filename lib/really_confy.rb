@@ -86,9 +86,9 @@ class ReallyConfy
     end
 
     env_configs = multi_env_configs.map{|multi_env_config|
-        multi_env_config.fetch('DEFAULTS', {}).deep_merge multi_env_config.fetch(env, {})
+        deep_merge multi_env_config.fetch('DEFAULTS', {}), multi_env_config.fetch(env, {})
       }
-    merged_config = env_configs.reduce{|merged_config, config| merged_config.deep_merge(config) }
+    merged_config = env_configs.reduce{|merged_config, config| deep_merge(merged_config, config) }
 
     merged_config['env'] ||= env
 
@@ -131,6 +131,25 @@ class ReallyConfy
   end
 
   private
+
+  def deep_merge(base_hash, other_hash, &block)
+    base_hash = base_hash.dup
+    other_hash.each_pair do |current_key, other_value|
+      this_value = base_hash[current_key]
+
+      base_hash[current_key] = if this_value.is_a?(Hash) && other_value.is_a?(Hash)
+        deep_merge(this_value, other_value, &block)
+      else
+        if block_given? && base_hash.key?(current_key)
+          block.call(current_key, this_value, other_value)
+        else
+          other_value
+        end
+      end
+    end
+
+    base_hash
+  end
 
   def full_path_to_config_file(file)
     File.absolute_path(relative_path_to_config_file(file))
