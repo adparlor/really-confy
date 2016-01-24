@@ -86,7 +86,7 @@ class ReallyConfy
     end
 
     env_configs = multi_env_configs.map{|multi_env_config|
-        deep_merge multi_env_config.fetch('DEFAULTS', {}), multi_env_config.fetch(env, {})
+        deep_merge multi_env_config.fetch('DEFAULTS', empty_config), multi_env_config.fetch(env, empty_config)
       }
     merged_config = env_configs.reduce{|merged_config, config| deep_merge(merged_config, config) }
 
@@ -118,13 +118,17 @@ class ReallyConfy
     raise e
   end
 
+  def empty_config
+    ReallyConfy::Config.new {}
+  end
+
   def load_config_file(file)
     full_path = full_path_to_config_file(file)
 
     if File.exists? full_path
       multi_env_config = (ReallyConfy::Config.load full_path)
     else
-      multi_env_config = ReallyConfy::Config.new {}
+      multi_env_config = empty_config
     end
 
     multi_env_config
