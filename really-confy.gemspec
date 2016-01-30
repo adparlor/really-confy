@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name    = "really-confy"
-  s.version = "0.2.1"
+  s.version = "0.2.2"
   s.date    = "2015-10-31"
   s.summary = "Simple YAML configuration loader"
   s.authors = ["Matt Zukowski", "Edward Tam"]
